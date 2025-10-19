@@ -1,0 +1,41 @@
+name: Create Firebase Hosting Site
+
+on:
+  workflow_dispatch:
+    inputs:
+      siteId:
+        description: "Firebase Hosting site ID"
+        required: true
+        default: "markdown-preview"
+
+jobs:
+  create-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Prepare Google Application Credentials
+        run: |
+          echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} | base64 --decode > $HOME/private-key.json
+
+      - name: Create Hosting site
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/private-key.json
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/private-key.json
+          firebase hosting:sites:create ${{ github.event.inputs.siteId }} --project toma-todo-app --json
+
+      - name: Cleanup
+        if: always()
+        run: rm -f $HOME/private-key.json
+
+
