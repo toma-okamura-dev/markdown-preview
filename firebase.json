@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "markdown-preview",
+    "site": "markdown-preview-app-f39a0",
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "headers": [

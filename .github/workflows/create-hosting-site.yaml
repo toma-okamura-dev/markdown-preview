@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       siteId:
-        description: "Firebase Hosting site ID"
+        description: 'Firebase Hosting site ID'
         required: true
-        default: "markdown-preview"
+        default: 'markdown-preview'
 
 jobs:
   create-site:
@@ -37,5 +37,3 @@ jobs:
       - name: Cleanup
         if: always()
         run: rm -f $HOME/private-key.json
-
-
