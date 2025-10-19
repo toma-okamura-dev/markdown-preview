@@ -7,7 +7,7 @@ describe('Markdownプレビューア App', () => {
   test('アプリタイトルが表示されている', () => {
     render(<App />);
     expect(
-      screen.getByRole('heading', { name: '📝 Markdownプレビュー' })
+      screen.getByRole('heading', { name: 'markdown-preview' })
     ).toBeInTheDocument();
   });
 

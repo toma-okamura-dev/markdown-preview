@@ -46,7 +46,7 @@ function App() {
       <div className="max-w-5xl mx-auto px-2 md:px-0">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-            📝 Markdownプレビュー
+            markdown-preview
           </h1>
 
           <div className="flex flex-col gap-4">
@@ -135,6 +135,7 @@ function App() {
                             href={href}
                             target="_blank"
                             rel="noopener noreferrer"
+                            title="markdown-preview"
                           >
                             {children}
                           </a>
