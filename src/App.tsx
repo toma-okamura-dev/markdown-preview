@@ -1,100 +1,51 @@
-import { useState } from 'react';
-
-type Todo = {
-  id: number;
-  title: string;
-  completed: boolean;
-};
+import { useMemo, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [title, setTitle] = useState('');
+  const [markdown, setMarkdown] = useState<string>(
+    '# ようこそ\n\n左のテキストエリアに **Markdown** を入力すると、右側にプレビューが表示されます。\n\n- 箇条書き\n- [リンク](https://example.com)\n\n```ts\nconst hello = "world";\n```'
+  );
 
-  const handleAddTodo = () => {
-    if (title.trim()) {
-      setTodos([...todos, { id: todos.length + 1, title, completed: false }]);
-      setTitle('');
-    }
-  };
-
-  const handleToggleTodo = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
+  const isEmpty = useMemo(() => markdown.trim().length === 0, [markdown]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-lg md:max-w-2xl mx-auto px-2 md:px-0">
+      <div className="max-w-5xl mx-auto px-2 md:px-0">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-            📝 Todoアプリ!
+            📝 Markdownプレビュー
           </h1>
 
-          <div className="flex gap-2 mb-6 flex-col sm:flex-row">
-            <input
-              type="text"
-              name="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="新しいタスクを入力..."
-              aria-label="新しいタスクを入力"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            />
-            <button
-              onClick={handleAddTodo}
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 w-full sm:w-auto"
-            >
-              追加
-            </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label htmlFor="markdown-input" className="sr-only">
+                Markdownを入力
+              </label>
+              <textarea
+                id="markdown-input"
+                aria-label="Markdownを入力"
+                value={markdown}
+                onChange={(e) => setMarkdown(e.target.value)}
+                placeholder="# 見出し\n**太字** _斜体_ \n[リンク](https://example.com) などが使えます"
+                className="min-h-[280px] md:min-h-[420px] w-full resize-vertical px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+              />
+            </div>
+
+            <div className="min-h-[280px] md:min-h-[420px] border border-gray-200 rounded-lg p-4 overflow-auto bg-gray-50">
+              {isEmpty ? (
+                <div className="h-full w-full text-gray-500 flex items-center justify-center text-center px-4">
+                  左側にMarkdownを入力するとここにプレビューが表示されます
+                </div>
+              ) : (
+                <article className="prose max-w-none prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:leading-7 prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {markdown}
+                  </ReactMarkdown>
+                </article>
+              )}
+            </div>
           </div>
-
-          {todos.length === 0 ? (
-            <div className="text-center text-gray-500 py-8">
-              <p className="text-lg">タスクがありません</p>
-              <p className="text-sm">新しいタスクを追加してください</p>
-            </div>
-          ) : (
-            <ul className="space-y-3">
-              {todos.map((todo) => (
-                <li
-                  key={todo.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                    todo.completed
-                      ? 'bg-gray-50 border-gray-200'
-                      : 'bg-white border-gray-300 hover:border-blue-300'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => handleToggleTodo(todo.id)}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                  />
-                  <span
-                    className={`flex-1 ${
-                      todo.completed
-                        ? 'line-through text-gray-500'
-                        : 'text-gray-800'
-                    }`}
-                  >
-                    {todo.title}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {todos.length > 0 && (
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600 text-center">
-                完了済み: {todos.filter((todo) => todo.completed).length} /{' '}
-                {todos.length}
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>

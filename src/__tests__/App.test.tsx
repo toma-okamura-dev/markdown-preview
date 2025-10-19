@@ -1,81 +1,43 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import App from '../App';
 
-describe('App', () => {
+describe('Markdownプレビューア App', () => {
   test('アプリタイトルが表示されている', () => {
     render(<App />);
     expect(
-      screen.getByRole('heading', { name: '📝 Todoアプリ!' })
+      screen.getByRole('heading', { name: '📝 Markdownプレビュー' })
     ).toBeInTheDocument();
   });
 
-  test('TODOを追加することができる', () => {
+  test('テキスト入力でMarkdownがプレビューに反映される', () => {
     render(<App />);
 
-    const input = screen.getByRole('textbox', { name: '新しいタスクを入力' });
-    const addButton = screen.getByRole('button', { name: '追加' });
+    const textarea = screen.getByRole('textbox', { name: 'Markdownを入力' });
 
-    fireEvent.change(input, { target: { value: 'テストタスク' } });
-    fireEvent.click(addButton);
+    fireEvent.change(textarea, { target: { value: '# タイトル\n\n本文' } });
 
-    const list = screen.getByRole('list');
-    expect(within(list).getByText('テストタスク')).toBeInTheDocument();
-  });
-
-  test('TODOを完了にすることができる', () => {
-    render(<App />);
-
-    const input = screen.getByRole('textbox', { name: '新しいタスクを入力' });
-    const addButton = screen.getByRole('button', { name: '追加' });
-
-    fireEvent.change(input, { target: { value: '完了テストタスク' } });
-    fireEvent.click(addButton);
-
-    const checkboxes = screen.getAllByRole('checkbox');
-    const lastCheckbox = checkboxes[checkboxes.length - 1];
-    fireEvent.click(lastCheckbox);
-
-    expect(lastCheckbox).toBeChecked();
-  });
-
-  test('完了したTODOの数が表示されている', () => {
-    render(<App />);
-
-    const input = screen.getByRole('textbox', { name: '新しいタスクを入力' });
-    const addButton = screen.getByRole('button', { name: '追加' });
-
-    fireEvent.change(input, { target: { value: 'タスク1' } });
-    fireEvent.click(addButton);
-
-    fireEvent.change(input, { target: { value: 'タスク2' } });
-    fireEvent.click(addButton);
-
-    const checkboxes = screen.getAllByRole('checkbox');
-    fireEvent.click(checkboxes[0]);
-
-    expect(screen.getByText('完了済み: 1 / 2')).toBeInTheDocument();
-  });
-
-  test('TODOがない場合は空状態メッセージが表示される', () => {
-    render(<App />);
-
-    expect(screen.getByText('タスクがありません')).toBeInTheDocument();
+    // h1 が描画される
     expect(
-      screen.getByText('新しいタスクを追加してください')
+      screen.getByRole('heading', { level: 1, name: 'タイトル' })
     ).toBeInTheDocument();
+    // 本文テキストが描画される
+    expect(screen.getByText('本文')).toBeInTheDocument();
   });
 
-  test('空のTODOは追加されない', () => {
+  test('GFM（チェックリスト）が描画される', () => {
     render(<App />);
 
-    const input = screen.getByRole('textbox', { name: '新しいタスクを入力' });
-    const addButton = screen.getByRole('button', { name: '追加' });
+    const textarea = screen.getByRole('textbox', { name: 'Markdownを入力' });
+    fireEvent.change(textarea, {
+      target: { value: '- [x] 完了\n- [ ] 未完了' },
+    });
 
-    fireEvent.change(input, { target: { value: '' } });
-    fireEvent.click(addButton);
-
-    expect(screen.getByText('タスクがありません')).toBeInTheDocument();
+    // チェックボックスが2つ描画される
+    const checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes.length).toBe(2);
+    expect(checkboxes[0]).toBeChecked();
+    expect(checkboxes[1]).not.toBeChecked();
   });
 });
