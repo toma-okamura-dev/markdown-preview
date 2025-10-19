@@ -16,7 +16,10 @@ declare module 'remark-gfm' {
 }
 
 declare module 'mermaid' {
-  export type RenderResult = { svg: string; bindFunctions?: (element: Element) => void };
+  export type RenderResult = {
+    svg: string;
+    bindFunctions?: (element: Element) => void;
+  };
   export function initialize(config: Record<string, unknown>): void;
   export function render(id: string, code: string): Promise<RenderResult>;
 }

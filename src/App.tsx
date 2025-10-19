@@ -5,20 +5,26 @@ import mermaid from 'mermaid';
 
 function MermaidBlock({ code }: { code: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const idRef = useRef<string>(`mermaid-${Math.random().toString(36).slice(2)}`);
+  const idRef = useRef<string>(
+    `mermaid-${Math.random().toString(36).slice(2)}`
+  );
 
   useEffect(() => {
     mermaid.initialize({ startOnLoad: false, theme: 'default' });
     const render = async () => {
       try {
         const id = idRef.current;
-        const { svg } = await mermaid.render(id || `mermaid-${Date.now()}`, code);
+        const { svg } = await mermaid.render(
+          id || `mermaid-${Date.now()}`,
+          code
+        );
         if (containerRef.current) {
           containerRef.current.innerHTML = svg;
         }
       } catch (e) {
         if (containerRef.current) {
-          containerRef.current.innerText = 'Mermaidの描画に失敗しました。記法をご確認ください。';
+          containerRef.current.innerText =
+            'Mermaidの描画に失敗しました。記法をご確認ください。';
         }
       }
     };
@@ -68,17 +74,29 @@ function App() {
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      code(
-                        { inline, className, children, ...props }:
-                          { inline?: boolean; className?: string; children?: React.ReactNode } & React.HTMLAttributes<HTMLElement>
-                      ) {
+                      code({
+                        inline,
+                        className,
+                        children,
+                        ...props
+                      }: {
+                        inline?: boolean;
+                        className?: string;
+                        children?: React.ReactNode;
+                      } & React.HTMLAttributes<HTMLElement>) {
                         const match = /language-(\w+)/.exec(className || '');
-                        const codeContent = String(children ?? '').replace(/\n$/, '');
+                        const codeContent = String(children ?? '').replace(
+                          /\n$/,
+                          ''
+                        );
                         if (!inline && match && match[1] === 'mermaid') {
                           return <MermaidBlock code={codeContent} />;
                         }
                         return (
-                          <code className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded" {...props}>
+                          <code
+                            className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded"
+                            {...props}
+                          >
                             {children}
                           </code>
                         );
@@ -86,10 +104,15 @@ function App() {
                       pre({ children }: { children?: React.ReactNode }) {
                         if (isValidElement(children)) {
                           const child: any = children;
-                          const className: string | undefined = child.props?.className;
-                          const isMermaid = typeof className === 'string' && className.includes('language-mermaid');
+                          const className: string | undefined =
+                            child.props?.className;
+                          const isMermaid =
+                            typeof className === 'string' &&
+                            className.includes('language-mermaid');
                           if (isMermaid) {
-                            const codeContent = String(child.props?.children ?? '').replace(/\n$/, '');
+                            const codeContent = String(
+                              child.props?.children ?? ''
+                            ).replace(/\n$/, '');
                             return <MermaidBlock code={codeContent} />;
                           }
                         }
@@ -99,15 +122,24 @@ function App() {
                           </pre>
                         );
                       },
-                      a(
-                        { children, href }: { children?: React.ReactNode; href?: string }
-                      ) {
+                      a({
+                        children,
+                        href,
+                      }: {
+                        children?: React.ReactNode;
+                        href?: string;
+                      }) {
                         return (
-                          <a className="text-blue-600 underline" href={href} target="_blank" rel="noopener noreferrer">
+                          <a
+                            className="text-blue-600 underline"
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             {children}
                           </a>
                         );
-                      }
+                      },
                     }}
                   >
                     {markdown}
